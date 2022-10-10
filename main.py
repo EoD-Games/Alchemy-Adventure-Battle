@@ -35,7 +35,7 @@ class WindowClass:
 Window = WindowClass((1920, 1080), "Alchemy Adventure Battle!")
 
 class LoadSprite:
-    def __init__(self, image, size, type="sprite", name="test", x=0, y=0, resource=None):
+    def __init__(self, image, size, type="sprite", name="test", x=0, y=0, resource=None, defense=None, amount=0):
         self.image = pygame.image.load(image).convert_alpha()
         self.size = size
         self.width, self.height = size
@@ -51,6 +51,7 @@ class LoadSprite:
             self.current_y = y
             self.speed = [0, 0]
             self.movement = [-4, 4]
+            self.items = {}
         elif type == "sprite" or type == "gui":
             self.x = x
             self.y = y
@@ -66,6 +67,12 @@ class LoadSprite:
             self.y = y
             self.resource = resource
             self.resAmnt = 0
+        elif type == "element":
+            self.x = x
+            self.y = y
+            self.attack = resource
+            self.defense = defense
+            self.amount = amount
         else:
             self.x = x
             self.y = y
