@@ -104,7 +104,7 @@ class LoadResource:
             self.defense = defense
             self.parentId = pID
 
-airSpawner = LoadResource("AirSpawn.png", (64, 64), 100, 100, "spawner", "Air Spawner")
+airSpawner = LoadResource("AirSpawn.png", (64, 64), 500, 300, "spawner", "Air Spawner")
 airSpawner.child = LoadResource("Air.png", (64, 64), airSpawner.x + random.randint(-100, 100), airSpawner.y + random.randint(-100, 100), "element", "Air", airSpawner.id)
 
 class GameClass:
