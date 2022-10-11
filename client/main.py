@@ -163,6 +163,8 @@ class GameClass:
                             i.child = LoadResource(i.child.image, i.child.size, i.x + random.randint(-100, 100), i.y + random.randint(-100, 100), "element", i.child.name, i.id, 1)
                             i.timer = 0
                             i.resProd += 1
+                        elif i.resProd >= 10:
+                            i.timer = 0
                         print(i.resProd)
                     if i.type == "element":
                         self.elem_interact(i)
