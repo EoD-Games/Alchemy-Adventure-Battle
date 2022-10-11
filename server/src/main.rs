@@ -1,4 +1,6 @@
 use ezoauth;
+use reqwest;
+use serde_json::Value;
 use tokio::net::TcpListener;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use std::env;
@@ -25,6 +27,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 			let (rx, auth_url) = ezoauth::authenticate(config, "localhost:8696").expect("Failed to authenticate");
 			println!("Client should authenticate at {auth_url}");
 			socket.write_all(auth_url.as_bytes()).await.expect("Failed to send OAuth URL");
+			let ores = rx.recv().unwrap().expect("No token");
+			let token = ores.access_token();
+			let res: Value = serde_json::from_str(&reqwest::Client::new().get("https://discord.com/api/users/@me")
+				.header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
+				.send()
+				.await.expect("Failed to get user")
+				.text()
+				.await.expect("Failed to get text")
+			).expect("Failed to dejson");
+			let uid = res["id"].as_str().unwrap();
+			let tag = format!("{}#{}", res["username"].as_str().unwrap(), res["discriminator"].as_str().unwrap());
+			println!("Client with id {uid} and username {tag} has joined.");
 			// todo
 		});
 	}
