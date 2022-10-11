@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 				auth_url: "https://discord.com/api/oauth2/authorize",
 				token_url: "https://discord.com/api/oauth2/token",
 				redirect_url: "http://localhost:8696",
-				client_id: "964274065508556800",
+				client_id: "1029317200424730680",
 				client_secret: &env::var("AAB_OAUTH_SECRET").unwrap(),
 				scopes: vec!["identify"]
 			};
