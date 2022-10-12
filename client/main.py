@@ -1,9 +1,12 @@
 import pygame
 from pygame.locals import *
 import os
+import sys
 import numpy as np
 import random
 import copy
+
+import socket, pickle
 
 # INITIALIZE #
 pygame.init()
@@ -65,6 +68,18 @@ class LoadSprite:
         
         Window.spriteList.append(self)
 
+try:
+    # Create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Connect the socket to the port where the server is listening
+    server_address = ('localhost', 8080)
+    print('connecting to {} port {}'.format(*server_address))
+    sock.connect(server_address)
+finally:
+    print('closing socket')
+    sock.close()
+
 Main = LoadSprite("Main.png", (64, 64), 64, 64, "character", "Placeholder")
 # textbox = LoadSprite("Textbox.png", (512, 320), "textbox", "textbox")
 
@@ -103,6 +118,8 @@ class LoadResource:
             self.attack = attack
             self.defense = defense
             self.parentId = pID
+
+
 
 airSpawner = LoadResource("AirSpawn.png", (64, 64), 500, 300, "spawner", "Air Spawner")
 airSpawner.child = LoadResource("Air.png", (64, 64), airSpawner.x + random.randint(-100, 100), airSpawner.y + random.randint(-100, 100), "element", "Air", airSpawner.id)
@@ -165,14 +182,14 @@ class GameClass:
                             i.resProd += 1
                         elif i.resProd >= 10:
                             i.timer = 0
-                        print(i.resProd)
+                        # print(i.resProd)
                     if i.type == "element":
                         self.elem_interact(i)
                     
                     pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
                     Window.screen.blit(i.shape, i.rect)
             
-            print([i.name for i in Main.items])
+            # print([i.name for i in Main.items])
             pygame.display.update()
     
     def elem_interact(self, element):
@@ -193,7 +210,7 @@ class GameClass:
         Window.screen.blit(textbox.shape, textbox.rect)
 
         Font.antialiased = False
-        print(textbox.rect)
+        # print(textbox.rect)
         Font.render_to(Window.screen, (textbox.x - 200, textbox.y - 100), text, color["black"])
 
     def reorder_rendering(self):
@@ -203,7 +220,7 @@ class GameClass:
             for j in Window.spriteList:
                 if j.type == order[i]:
                     dummy.append(j)
-        print([i.type for i in dummy])
+        # print([i.type for i in dummy])
         Window.spriteList = dummy
 
 Game = GameClass()
