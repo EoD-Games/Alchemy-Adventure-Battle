@@ -172,32 +172,32 @@ class GameClass:
                     self.running = False
                 if event.type == KEYUP:
                     keydown = False
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_w:
                         Main.speed[1] = 0
                         Main.movementFlags[0] = 0
-                    if event.key == pygame.K_DOWN:
+                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         Main.speed[1] = 0
                         Main.movementFlags[1] = 0
-                    if event.key == pygame.K_LEFT:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                         Main.speed[0] = 0
                         Main.movementFlags[2] = 0
-                    if event.key == pygame.K_RIGHT:
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                         Main.speed[0] = 0
                         Main.movementFlags[3] = 0
                 elif event.type == pygame.KEYDOWN:
                     keydown = True
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_w:
                         Main.speed[1] = Main.movement[0]
                         Main.movementFlags[0] = 1
-                    if event.key == pygame.K_DOWN:
+                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         Main.speed[1] = Main.movement[1]
                         Main.movementFlags[1] = 1
-                    if event.key == pygame.K_LEFT:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                         Main.speed[0] = Main.movement[0]
                         Main.movementFlags[2] = 1
-                    if event.key == pygame.K_RIGHT:
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                         Main.speed[0] = Main.movement[1]
                         Main.movementFlags[3] = 1
                     if event.key == pygame.K_e:
