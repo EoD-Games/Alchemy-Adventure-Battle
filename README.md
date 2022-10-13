@@ -14,7 +14,12 @@ A battle / elemental combo
    (These are basic python libraries)
 2. Then navigate to the game (inside the client folder) and run "main.py"
 
-# Recent Update (v0.2.01):
+# Recent Update (v0.2.04):
+#### Minor
+- run game through a bat
+- wasd support
+
+#### Major
 - Inventory GUI implemented
 - Improved GUI / rendering order and implementation
 - `Q`: drop all elements
