@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 import random
-import copy
+# import copy
 
 # import socket, pickle
 
@@ -328,7 +328,7 @@ class GameClass:
         incY = 0
         lID = 0
         Window.guiList = []
-        
+
         for j in Main.items:
             x = LoadSprite(j.image, (20, 20), Gui.x + incX - (Gui.size[0] / 2 - 35), Gui.y + incY, "topGuiElement", j.name + ".gui", lID)
 
