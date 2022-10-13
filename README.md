@@ -5,15 +5,14 @@ A battle / elemental combo
 ### Follow these steps to fully ensure your gaming experience is flawless
 #### Windows
 1. Download Python : https://www.python.org/downloads/,  make sure to install it to PATH
-2. run "setup.bat". This installs very basic python libraries (if you dont trust it, just look at it as a text file)
+2. run "start.bat". (this installs pip, pygame, and numpy, then runs the game)
 #### Linux
 1. Open the terminal and type the following commands:  
    `python -m ensurepip`
    `pip install pygame`
    `pip install numpy`
    (These are basic python libraries)
-
-Then navigate to the game (inside the client folder) and run "main.py"
+2. Then navigate to the game (inside the client folder) and run "main.py"
 
 # Recent Update (v0.2.01):
 - Inventory GUI implemented
