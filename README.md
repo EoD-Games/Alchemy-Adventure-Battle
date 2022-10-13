@@ -3,14 +3,17 @@ A battle / elemental combo
 
 # How to play
 ### Follow these steps to fully ensure your gaming experience is flawless
+#### Windows
 1. Download Python : https://www.python.org/downloads/,  make sure to install it to PATH
-2. Open the command prompt and type the following commands:  
+2. run "setup.bat". This installs very basic python libraries (if you dont trust it, just look at it in a text file)
+#### Linux
+1. Open the terminal and type the following commands:  
    `python -m ensurepip`
    `pip install pygame`
    `pip install numpy`
    (These are basic python libraries)
-3. Navigate to where the game is (/client/)
-4. run `main.py`
+
+Then navigate to the game (inside the client folder) and run "main.py"
 
 # Recent Update (v0.2.01):
 - Inventory GUI implemented
