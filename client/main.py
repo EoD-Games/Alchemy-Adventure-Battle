@@ -4,6 +4,7 @@ import os
 import sys
 import numpy as np
 import random
+import math
 # import copy
 
 # import socket, pickle
@@ -107,6 +108,28 @@ Gui = LoadSprite("hotbar.png", (Window.width - 64, 64), Window.width / 2, Window
 
 resourceId = 0
 
+class LoadBackground:
+    def __init__(self, image, size, name="test"):
+        self.image = pygame.image.load(image).convert_alpha()
+        self.size = size
+        self.width, self.height = self.size
+        self.shape = pygame.transform.scale(self.image, self.size)
+        self.rect = self.shape.get_rect()
+        self.rect.center = (self.width / (self.width / 2), self.height / (self.height / 2))
+        self.name = name
+        self.type = "background"
+        self.render = True
+        Window.spriteList.append(self)
+
+    def tile_background(self):
+        for i in range(math.ceil(Window.width / self.width) + 2):
+            for j in range(math.ceil(Window.height / self.height) + 2):
+                Window.screen.blit(self.shape, self.rect)
+                self.rect.center = ((self.width / 2) * (i * 2) + (screenX % self.width) - self.width, (self.height / 2) * (j * 2) + (screenY % self.height) - self.height)
+
+
+Background = LoadBackground("background.png", (128, 128), "mainBg")
+
 class LoadResource:
     def __init__(self, image, size, x, y, type="element", name="test", pID=0, check=0, attack=0, defense=0):
         global resourceId
@@ -163,88 +186,11 @@ class GameClass:
         self.resources = {}
     
     def run(self):
-        global screenX, screenY, keydown
         while self.running:
             self.prevFps = self.fps
             self.fps = pygame.time.Clock().tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                if event.type == KEYUP:
-                    keydown = False
-                    if event.key == pygame.K_UP or event.key == pygame.K_w:
-                        Main.speed[1] = 0
-                        Main.movementFlags[0] = 0
-                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                        Main.speed[1] = 0
-                        Main.movementFlags[1] = 0
-                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                        Main.speed[0] = 0
-                        Main.movementFlags[2] = 0
-                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                        Main.speed[0] = 0
-                        Main.movementFlags[3] = 0
-                elif event.type == pygame.KEYDOWN:
-                    keydown = True
-                    if event.key == pygame.K_ESCAPE:
-                        self.running = False
-                    if event.key == pygame.K_UP or event.key == pygame.K_w:
-                        Main.speed[1] = Main.movement[0]
-                        Main.movementFlags[0] = 1
-                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                        Main.speed[1] = Main.movement[1]
-                        Main.movementFlags[1] = 1
-                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                        Main.speed[0] = Main.movement[0]
-                        Main.movementFlags[2] = 1
-                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                        Main.speed[0] = Main.movement[1]
-                        Main.movementFlags[3] = 1
-                    if event.key == pygame.K_e:
-                        textbox.open = not textbox.open
-                    if event.key == pygame.K_q:
-                        Main.items = []
-                        self.redraw_elements()
 
-            if Main.rect.x < 48:
-                screenX += 1 * (1 + (1 / Main.rect.x) * 120)
-                Main.speed[0] += .3 * (1 + 1 / Main.rect.x)
-                if Main.rect.x < 30 and not Main.movementFlags[3] and Main.movementFlags[2]:
-                    Main.speed[0] = 0
-            elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2]:
-                Main.speed[0] = Main.movement[0]
-            elif not (Main.movementFlags[2] or Main.movementFlags[3]):
-                Main.speed[0] = 0
-
-            if Main.rect.y < 48:
-                screenY += 1 * (1 + (1 / Main.rect.y) * 120)
-                Main.speed[1] += .3 * (1 + 1 / Main.rect.y)
-                if Main.rect.y < 30 and not Main.movementFlags[1] and Main.movementFlags[0]:
-                    Main.speed[1] = 0
-            elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0]:
-                Main.speed[1] = Main.movement[0]
-            elif not (Main.movementFlags[0] or Main.movementFlags[1]):
-                Main.speed[1] = 0
-
-            if Main.rect.x > Window.width - 48 - 64:
-                screenX -= 1 * (1 + (Window.width / Main.rect.x) * 5)
-                Main.speed[0] -= .3 * (1 + Window.width / Main.rect.x)
-                if Main.rect.x > Window.width - 40 - 64 and not Main.movementFlags[2] and Main.movementFlags[3]:
-                    Main.speed[0] = 0
-            elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3]:
-                Main.speed[0] = Main.movement[1]
-            elif not (Main.movementFlags[3] or Main.movementFlags[2]):
-                Main.speed[0] = 0
-
-            if Main.rect.y > Window.height - 48 - 64 - 32:
-                screenY -= 1 * (1 + (Window.height / Main.rect.y) * 5)
-                Main.speed[1] -= .3 * (1 + Window.height / Main.rect.y)
-                if Main.rect.y > Window.height - 40 - 64 - 32 and not Main.movementFlags[0] and Main.movementFlags[1]:
-                    Main.speed[1] = 0
-            elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1]:
-                Main.speed[1] = Main.movement[1]
-            elif not (Main.movementFlags[1] or Main.movementFlags[0]):
-                Main.speed[1] = 0
+            self.player_movement()
             
             Main.rect = Main.rect.move(Main.speed)
 
@@ -253,11 +199,11 @@ class GameClass:
             self.reorder_rendering()
 
             for i in Window.spriteList:
-                if i.type != "textbox":
+                if i.type != "textbox" and i.type != "background":
                     if i.type == "spawner":
                         if self.prevFps != self.fps:
                             i.timer += 1
-                        if (i.timer == 20 + random.randint(-4, 4) or i.timer == 25) and i.resProd < 10:
+                        if (i.timer == 30 + random.randint(-6, 6) or i.timer == 40) and i.resProd < 10:
                             copyElem = LoadResource(i.child.image, i.child.size, i.child.x, i.child.y, "element", i.child.name, i.id, 1)
                             i.children.append(copyElem)
                             Window.spriteList.append(i.children[len(i.children) - 1])
@@ -277,6 +223,9 @@ class GameClass:
                         Window.screen.blit(i.shape, i.rect)
                     else:
                         i.render = True
+                elif i.type == "background":
+                    i.tile_background()
+
             
             for i in Window.guiList:
                 self.elem_interact(i)
@@ -285,6 +234,87 @@ class GameClass:
 
             pygame.display.update()
     
+    def player_movement(self):
+        global screenX, screenY, keydown
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == KEYUP:
+                keydown = False
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    Main.speed[1] = 0
+                    Main.movementFlags[0] = 0
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    Main.speed[1] = 0
+                    Main.movementFlags[1] = 0
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    Main.speed[0] = 0
+                    Main.movementFlags[2] = 0
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    Main.speed[0] = 0
+                    Main.movementFlags[3] = 0
+            elif event.type == pygame.KEYDOWN:
+                keydown = True
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    Main.speed[1] = Main.movement[0]
+                    Main.movementFlags[0] = 1
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    Main.speed[1] = Main.movement[1]
+                    Main.movementFlags[1] = 1
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    Main.speed[0] = Main.movement[0]
+                    Main.movementFlags[2] = 1
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    Main.speed[0] = Main.movement[1]
+                    Main.movementFlags[3] = 1
+                if event.key == pygame.K_e:
+                    textbox.open = not textbox.open
+                if event.key == pygame.K_q:
+                    Main.items = []
+                    self.redraw_elements()
+
+        if Main.rect.x < 48 and Main.movementFlags[2]:
+            screenX += 1 * (1 + (1 / Main.rect.x) * 120)
+            Main.speed[0] += .3 * (1 + 1 / Main.rect.x)
+            if Main.rect.x < 30 and not Main.movementFlags[3]:
+                Main.speed[0] = 0
+        elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2]:
+            Main.speed[0] = Main.movement[0]
+        elif not Main.movementFlags[2] and not Main.movementFlags[3]:
+            Main.speed[0] = 0
+
+        if Main.rect.y < 48 and Main.movementFlags[0]:
+            screenY += 1 * (1 + (1 / Main.rect.y) * 120)
+            Main.speed[1] += .3 * (1 + 1 / Main.rect.y)
+            if Main.rect.y < 30 and not Main.movementFlags[1] and Main.movementFlags[0]:
+                Main.speed[1] = 0
+        elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0]:
+            Main.speed[1] = Main.movement[0]
+        elif not (Main.movementFlags[0] or Main.movementFlags[1]):
+            Main.speed[1] = 0
+
+        if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3]:
+            screenX -= 1 * (1 + (Window.width / Main.rect.x) * 3)
+            Main.speed[0] -= .3 * (1 + Window.width / Main.rect.x)
+            if Main.rect.x > Window.width - 32 - 64 and not Main.movementFlags[2] and Main.movementFlags[3]:
+                Main.speed[0] = 0
+        elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3]:
+            Main.speed[0] = Main.movement[1]
+        elif not (Main.movementFlags[3] or Main.movementFlags[2]):
+            Main.speed[0] = 0
+
+        if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1]:
+            screenY -= 1 * (1 + (Window.height / Main.rect.y) * 3)
+            Main.speed[1] -= .3 * (1 + Window.height / Main.rect.y)
+            if Main.rect.y > Window.height - 42 - 64 - 32 and not Main.movementFlags[0] and Main.movementFlags[1]:
+                Main.speed[1] = 0
+        elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1]:
+            Main.speed[1] = Main.movement[1]
+        elif not (Main.movementFlags[1] or Main.movementFlags[0]):
+            Main.speed[1] = 0
+
     def elem_interact(self, element):
         global Gui
         px, py = Main.rect.center
@@ -337,11 +367,11 @@ class GameClass:
                 incX = 0
                 incY += 16
         
-        print([i.name for i in Window.guiList], [i.name for i in Main.items])
+        # print([i.name for i in Window.guiList], [i.name for i in Main.items])
 
     def reorder_rendering(self):
         dummy = []
-        order = ["gui", "spawner", "element", "sprite", "character", "textbox", "topGui"]
+        order = ["background", "gui", "spawner", "element", "sprite", "character", "textbox", "topGui"]
         for i in range(len(order)):
             for j in Window.spriteList:
                 if j.type == order[i]:
