@@ -267,8 +267,6 @@ class GameClass:
             self.fps = pygame.time.Clock().tick(60)
 
             self.player_movement()
-            
-            print(Main.x, Main.y)
 
             Main.rect = Main.rect.move(Main.speed)
 
