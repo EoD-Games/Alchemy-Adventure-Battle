@@ -362,16 +362,16 @@ class GameClass:
                 keydown = True
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
-                if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2048:
+                if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2148:
                     Main.speed[1] = Main.movement[0]
                     Main.movementFlags[0] = 1
-                if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and Main.y < 4096:
+                if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and Main.y < 4196:
                     Main.speed[1] = Main.movement[1]
                     Main.movementFlags[1] = 1
-                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and Main.x > -2048:
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and Main.x > -2148:
                     Main.speed[0] = Main.movement[0]
                     Main.movementFlags[2] = 1
-                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and Main.x < 4096:
+                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and Main.x < 4196:
                     Main.speed[0] = Main.movement[1]
                     Main.movementFlags[3] = 1
                 if event.key == pygame.K_e:
@@ -381,44 +381,44 @@ class GameClass:
                     Main.items = []
                     self.redraw_elements()
 
-        if Main.rect.x < 48 and Main.movementFlags[2] and Main.x > -2048:
+        if Main.rect.x < 48 and Main.movementFlags[2] and Main.x > -2148:
             screenX += 1 * (1 + (1 / Main.rect.x) * 120)
             Main.speed[0] += .3 * (1 + 1 / Main.rect.x)
             if Main.rect.x < 30 and not Main.movementFlags[3]:
                 Main.speed[0] = 0
-        elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2] and Main.x > -2048:
+        elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2] and Main.x > -2148:
             Main.speed[0] = Main.movement[0]
         elif not (Main.movementFlags[2] or Main.movementFlags[3]) or Main.x < -2048:
             Main.speed[0] = 0
 
-        if Main.rect.y < 48 and Main.movementFlags[0] and Main.y > -2048:
+        if Main.rect.y < 48 and Main.movementFlags[0] and Main.y > -2148:
             screenY += 1 * (1 + (1 / Main.rect.y) * 120)
             Main.speed[1] += .3 * (1 + 1 / Main.rect.y)
             if Main.rect.y < 30 and not Main.movementFlags[1] and Main.movementFlags[0]:
                 Main.speed[1] = 0
-        elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0] and Main.y > -2048:
+        elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0] and Main.y > -2148:
             Main.speed[1] = Main.movement[0]
-        elif not (Main.movementFlags[0] or Main.movementFlags[1]) or Main.y < -2048:
+        elif not (Main.movementFlags[0] or Main.movementFlags[1]) or Main.y < -2148:
             Main.speed[1] = 0
 
-        if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3] and Main.x < 4096:
+        if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3] and Main.x < 4196:
             screenX -= 1 * (1 + (Window.width / Main.rect.x) * 3)
             Main.speed[0] -= .3 * (1 + Window.width / Main.rect.x)
             if Main.rect.x > Window.width - 32 - 64 and not Main.movementFlags[2] and Main.movementFlags[3]:
                 Main.speed[0] = 0
-        elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3] and Main.x < 4096:
+        elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3] and Main.x < 4196:
             Main.speed[0] = Main.movement[1]
-        elif not (Main.movementFlags[3] or Main.movementFlags[2]) or Main.x > 4096:
+        elif not (Main.movementFlags[3] or Main.movementFlags[2]) or Main.x > 4196:
             Main.speed[0] = 0
 
-        if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1] and Main.y < 4096:
+        if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1] and Main.y < 4196:
             screenY -= 1 * (1 + (Window.height / Main.rect.y) * 3)
             Main.speed[1] -= .3 * (1 + Window.height / Main.rect.y)
             if Main.rect.y > Window.height - 42 - 64 - 32 and not Main.movementFlags[0] and Main.movementFlags[1]:
                 Main.speed[1] = 0
-        elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1] and Main.y < 4096:
+        elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1] and Main.y < 4196:
             Main.speed[1] = Main.movement[1]
-        elif not (Main.movementFlags[1] or Main.movementFlags[0]) or Main.y > 4096:
+        elif not (Main.movementFlags[1] or Main.movementFlags[0]) or Main.y > 4196:
             Main.speed[1] = 0
 
     def elem_interact(self, element):
