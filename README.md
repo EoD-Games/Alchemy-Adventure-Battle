@@ -1,7 +1,7 @@
 # Alchemy-Adventure-Battle
 A battle / elemental combo
 
-# How to play
+# How to run
 ### Follow these steps to fully ensure your gaming experience is flawless
 #### Windows
 1. Download Python : https://www.python.org/downloads/,  make sure to install it to PATH
@@ -13,6 +13,11 @@ A battle / elemental combo
    `pip install numpy`
    (These are basic python libraries)
 2. Then navigate to the game (inside the client folder) and run "main.py"
+
+# How to play
+- WASD / Arrow keys : Movement
+- Q : Drop elements
+Walk around and collect elements from spawners! Crafting will eventually use E
 
 # Recent Update (v0.3.02):
 #### Minor (v2)
@@ -38,7 +43,7 @@ A battle / elemental combo
 - server connection
 - basic player interaction
 - card game battle DEMO
-### TBD
+##### TBD
 - music
 - animation
 - polish
