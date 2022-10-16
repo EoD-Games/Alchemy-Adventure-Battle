@@ -95,6 +95,7 @@ class LoadSprite:
             self.movementFlags = [0, 0, 0, 0]
             # inventory
             self.items = []
+            Window.spriteList.append(self)
         elif type == "gui" or type == "topGui":
             # center of gui
             self.rect.center = (x, y)
@@ -102,6 +103,7 @@ class LoadSprite:
             self.x, self.y = self.rect.center
             # list of items within gui
             self.items = []
+            Window.spriteList.append(self)
         elif type == "textbox":
             # x and y are absolute
             self.x = Window.width - self.width
@@ -111,6 +113,7 @@ class LoadSprite:
             self.open = False
             # e key is pressed flag
             self.eKey = False
+            Window.spriteList.append(self)
         elif type == "topGuiElement":
             # render flag set to false
             self.render = False
@@ -119,12 +122,11 @@ class LoadSprite:
             # center
             self.rect.center = (x, y)
             self.x, self.y = self.rect.center
+            Window.guiList.append(self)
         else:
             self.rect.center = (x, y)
             self.x, self.y = self.rect.center
-        
-        # put into display list
-        Window.spriteList.append(self)
+            Window.spriteList.append(self)
 
 # try:
 #     # Create a TCP/IP socket
@@ -242,21 +244,30 @@ class GameClass:
         # TODO: get seed from server
 
         print("Loading: 0%")
-        self.generate_spawners(self.chunkX, self.chunkY)
-        self.generated_area.append([0, 0])
         self.generate_spawners(0, 0)
         self.generated_area.append([-1, -1])
-        print("Loading: 25%")
-        self.generate_spawners(self.chunkX * 2, self.chunkY)
-        self.generated_area.append([1, 0])
+        print("Loading: 11%")
         self.generate_spawners(0, self.chunkY)
         self.generated_area.append([-1, 0])
-        print("Loading: 50%")
-        self.generate_spawners(self.chunkX, self.chunkY * 2)
-        self.generated_area.append([0, 1])
+        print("Loading: 22%")
+        self.generate_spawners(-self.chunkX, self.chunkY * 2)
+        self.generated_area.append([-1, 1])
+        print("Loading: 33%")
         self.generate_spawners(self.chunkX, 0)
         self.generated_area.append([0, -1])
-        print("Loading: 75%")
+        print("Loading: 44%")
+        self.generate_spawners(self.chunkX, self.chunkY)
+        self.generated_area.append([0, 0])
+        print("Loading: 55%")
+        self.generate_spawners(self.chunkX, self.chunkY * 2)
+        self.generated_area.append([0, 1])
+        print("Loading: 66%")
+        self.generate_spawners(self.chunkX * 2, -self.chunkY)
+        self.generated_area.append([1, -1])
+        print("Loading: 77%")
+        self.generate_spawners(self.chunkX * 2, self.chunkY)
+        self.generated_area.append([1, 0])
+        print("Loading: 88%")
         self.generate_spawners(self.chunkX * 2, self.chunkY * 2)
         self.generated_area.append([1, 1])
         print("Loading: 100%")
@@ -267,6 +278,8 @@ class GameClass:
             self.fps = pygame.time.Clock().tick(60)
 
             self.player_movement()
+
+            print(Main.x, Main.y)
 
             Main.rect = Main.rect.move(Main.speed)
 
@@ -347,32 +360,24 @@ class GameClass:
             if event.type == KEYUP:
                 keydown = False
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    Main.speed[1] = 0
                     Main.movementFlags[0] = 0
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    Main.speed[1] = 0
                     Main.movementFlags[1] = 0
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    Main.speed[0] = 0
                     Main.movementFlags[2] = 0
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    Main.speed[0] = 0
                     Main.movementFlags[3] = 0
             elif event.type == pygame.KEYDOWN:
                 keydown = True
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
                 if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2148:
-                    Main.speed[1] = Main.movement[0]
                     Main.movementFlags[0] = 1
                 if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and Main.y < 4196:
-                    Main.speed[1] = Main.movement[1]
                     Main.movementFlags[1] = 1
                 if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and Main.x > -2148:
-                    Main.speed[0] = Main.movement[0]
                     Main.movementFlags[2] = 1
                 if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and Main.x < 4196:
-                    Main.speed[0] = Main.movement[1]
                     Main.movementFlags[3] = 1
                 if event.key == pygame.K_e:
                     # textbox.open = not textbox.open
@@ -388,7 +393,7 @@ class GameClass:
                 Main.speed[0] = 0
         elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2] and Main.x > -2148:
             Main.speed[0] = Main.movement[0]
-        elif not (Main.movementFlags[2] or Main.movementFlags[3]) or Main.x < -2048:
+        elif (not Main.movementFlags[2] and not Main.movementFlags[3]) or Main.x < -2148:
             Main.speed[0] = 0
 
         if Main.rect.y < 48 and Main.movementFlags[0] and Main.y > -2148:
@@ -398,17 +403,19 @@ class GameClass:
                 Main.speed[1] = 0
         elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0] and Main.y > -2148:
             Main.speed[1] = Main.movement[0]
-        elif not (Main.movementFlags[0] or Main.movementFlags[1]) or Main.y < -2148:
+        elif (not Main.movementFlags[0] and not Main.movementFlags[1]) or Main.y < -2148:
             Main.speed[1] = 0
 
         if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3] and Main.x < 4196:
+            Main.movementFlags[2] = 0
             screenX -= 1 * (1 + (Window.width / Main.rect.x) * 3)
             Main.speed[0] -= .3 * (1 + Window.width / Main.rect.x)
             if Main.rect.x > Window.width - 32 - 64 and not Main.movementFlags[2] and Main.movementFlags[3]:
                 Main.speed[0] = 0
         elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3] and Main.x < 4196:
+            Main.movementFlags[2] = 0
             Main.speed[0] = Main.movement[1]
-        elif not (Main.movementFlags[3] or Main.movementFlags[2]) or Main.x > 4196:
+        elif (not Main.movementFlags[2] and not Main.movementFlags[3]):
             Main.speed[0] = 0
 
         if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1] and Main.y < 4196:
@@ -418,7 +425,7 @@ class GameClass:
                 Main.speed[1] = 0
         elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1] and Main.y < 4196:
             Main.speed[1] = Main.movement[1]
-        elif not (Main.movementFlags[1] or Main.movementFlags[0]) or Main.y > 4196:
+        elif (not Main.movementFlags[0] and not Main.movementFlags[1]):
             Main.speed[1] = 0
 
     def elem_interact(self, element):
