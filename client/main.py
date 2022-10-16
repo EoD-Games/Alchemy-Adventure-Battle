@@ -29,66 +29,102 @@ color = {"white": (255, 255, 255),
     "lightgray": (192, 192, 192),
 }
 
+# WINDOW CLASS #
 class WindowClass:
     def __init__(self, size=(1920, 1080), title="Window", color=color["white"]):
+        # size of the window
         self.size = size
+        # set title
         self.title = pygame.display.set_caption(title)
+        # width and height specification
         self.width, self.height = size
+        # set the screen size
         self.screen = pygame.display.set_mode(self.size)
+        # main window color
         self.color = color
+        # center of window
         self.center = (self.width/2, self.height/2)
+        # list of all things on screen, excluding inventory items
         self.spriteList = []
+        # list of all text on screen
         self.fontList = []
+        # list of all inventory items on screen
         self.guiList = []
 
+# Must be called "Window"
 Window = WindowClass((1920 / 2, 1080 / 2), "Alchemy Adventure Battle!")
 
+# position of top right corner of screen
 screenX = 0
 screenY = 0
 
+# SPRITES EXCLUDING RESOURCES #
 class LoadSprite:
     def __init__(self, image, size, x, y, type="sprite", name="test", lID=0):
+        # if image is already defined, image is image
+        # else, image is pygame
         try:
             self.image = pygame.image.load(image).convert_alpha()
         except: self.image = image
+        # size of sprite
         self.size = size
+        # width and height of sprite
         self.width, self.height = size
+        # set shape of sprite
         self.shape = pygame.transform.scale(self.image, self.size)
+        # name of sprite
         self.name = name
+        # set rect of sprite
         self.rect = self.shape.get_rect()
+        # type of sprite
         self.type = type
+        # render flag
         self.render = True
+        ### TYPES
+        # character (Main character)
         if type == "character":
+            # center of character
             self.rect.center = (x, y)
+            # first frame x and y of character
             self.x, self.y = self.rect.center
+            # directional speed
             self.speed = [0, 0]
+            # how fast a character can move forward and backward
             self.movement = [-4, 4]
+            # which direction is currently in motion
             self.movementFlags = [0, 0, 0, 0]
+            # inventory
             self.items = []
-            Window.spriteList.append(self)
         elif type == "gui" or type == "topGui":
+            # center of gui
             self.rect.center = (x, y)
+            # first frame x and y of gui
             self.x, self.y = self.rect.center
+            # list of items within gui
             self.items = []
-            Window.spriteList.append(self)
         elif type == "textbox":
+            # x and y are absolute
             self.x = Window.width - self.width
             self.y = Window.height - self.height
             self.rect.center = (self.x, self.y)
-            self.x, self.y = self.rect.center
+            # open flag
             self.open = False
+            # e key is pressed flag
             self.eKey = False
-            Window.spriteList.append(self)
         elif type == "topGuiElement":
+            # render flag set to false
             self.render = False
+            # id for displaying
             self.id = lID
+            # center
             self.rect.center = (x, y)
             self.x, self.y = self.rect.center
-            Window.guiList.append(self)
         else:
             self.rect.center = (x, y)
             self.x, self.y = self.rect.center
-            Window.spriteList.append(self)
+        
+        # put into display list
+        Window.spriteList.append(self)
 
 # try:
 #     # Create a TCP/IP socket
@@ -102,32 +138,52 @@ class LoadSprite:
 #     print('closing socket')
 #     sock.close()
 
+# MAIN CHARACTER MUST BE MAIN
 Main = LoadSprite("Main.png", (64, 64), 256, 256, "character", "Player")
+# MAIN GUI MUST BE GUI
 Gui = LoadSprite("hotbar.png", (Window.width - 64, 64), Window.width / 2, Window.height - 32, "topGui", "hotbar")
+
 # textbox = LoadSprite("Textbox.png", (512, 320), "textbox", "textbox")
 
 resourceId = 0
 
+# BACKGROUND #
 class LoadBackground:
     def __init__(self, image, size, name="test"):
+        # image
         self.image = pygame.image.load(image).convert_alpha()
+        # size
         self.size = size
+
+        # width / height
         self.width, self.height = self.size
+        # display shape
         self.shape = pygame.transform.scale(self.image, self.size)
+        # display rect
         self.rect = self.shape.get_rect()
+        # center
         self.rect.center = (self.width / (self.width / 2), self.height / (self.height / 2))
+        # name
         self.name = name
+        # type
         self.type = "background"
+        # render flag
         self.render = True
+        # set to display
         Window.spriteList.append(self)
 
+    # tile background
     def tile_background(self):
+        # for every x value a background is able to fill + 2
         for i in range(math.ceil(Window.width / self.width) + 2):
+            # for every y value a background is able to fill + 2
             for j in range(math.ceil(Window.height / self.height) + 2):
+                # blit to the screen
                 Window.screen.blit(self.shape, self.rect)
+                # set new center (the middle of the background * x/y value * 2 + screen offset)
                 self.rect.center = ((self.width / 2) * (i * 2) + (screenX % self.width) - self.width, (self.height / 2) * (j * 2) + (screenY % self.height) - self.height)
 
-
+# BACKGROUND, multiple backgrounds can exist
 Background = LoadBackground("background.png", (128, 128), "mainBg")
 
 class LoadResource:
@@ -166,15 +222,6 @@ class LoadResource:
             self.defense = defense
             self.parentId = pID
 
-airSpawner = LoadResource("spawner.png", (64, 64), 500, 300, "spawner", "Air Spawner")
-airSpawner.child = LoadResource("air.png", (32, 32), airSpawner.x + random.randint(-100, 100), airSpawner.y + random.randint(-100, 100), "element", "Air", airSpawner.id)
-earthSpawner = LoadResource("spawner.png", (64, 64), 500, 600, "spawner", "Earth Spawner")
-earthSpawner.child = LoadResource("earth.png", (32, 32), earthSpawner.x + random.randint(-100, 100), earthSpawner.y + random.randint(-100, 100), "element", "Earth", earthSpawner.id)
-fireSpawner = LoadResource("spawner.png", (64, 64), 800, 300, "spawner", "Fire Spawner")
-fireSpawner.child = LoadResource("fire.png", (32, 32), fireSpawner.x + random.randint(-100, 100), fireSpawner.y + random.randint(-100, 100), "element", "Fire", fireSpawner.id)
-waterSpawner = LoadResource("spawner.png", (64, 64), 800, 600, "spawner", "Water Spawner")
-waterSpawner.child = LoadResource("water.png", (32, 32), waterSpawner.x + random.randint(-100, 100), waterSpawner.y + random.randint(-100, 100), "element", "Water", waterSpawner.id)
-
 keydown = True
 
 class GameClass:
@@ -184,14 +231,45 @@ class GameClass:
         self.prevFps = 0
         self.fps = 0
         self.resources = {}
+        self.generation_number = 0
+        self.generateNewChunk = False
+        self.chunkX, self.chunkY = (2048, 2048)
+        self.generated_area = []
     
     def run(self):
+        global screenX, screenY
+        random.seed(random.randint(0, 65535))
+        # TODO: get seed from server
+
+        print("Loading: 0%")
+        self.generate_spawners(self.chunkX, self.chunkY)
+        self.generated_area.append([0, 0])
+        self.generate_spawners(0, 0)
+        self.generated_area.append([-1, -1])
+        print("Loading: 25%")
+        self.generate_spawners(self.chunkX * 2, self.chunkY)
+        self.generated_area.append([1, 0])
+        self.generate_spawners(0, self.chunkY)
+        self.generated_area.append([-1, 0])
+        print("Loading: 50%")
+        self.generate_spawners(self.chunkX, self.chunkY * 2)
+        self.generated_area.append([0, 1])
+        self.generate_spawners(self.chunkX, 0)
+        self.generated_area.append([0, -1])
+        print("Loading: 75%")
+        self.generate_spawners(self.chunkX * 2, self.chunkY * 2)
+        self.generated_area.append([1, 1])
+        print("Loading: 100%")
+
         while self.running:
+
             self.prevFps = self.fps
             self.fps = pygame.time.Clock().tick(60)
 
             self.player_movement()
             
+            print(Main.x, Main.y)
+
             Main.rect = Main.rect.move(Main.speed)
 
             Window.screen.fill(self.background)
@@ -217,7 +295,9 @@ class GameClass:
                         self.elem_interact(i)
                     if i.type != "character" and i.type != "topGui" and i.type != "gui" and i.type != "topGuiElement":
                         i.rect.center = (i.x + screenX, i.y + screenY)
-
+                    elif i.type == "character":
+                        i.x = i.rect.x - screenX
+                        i.y = i.rect.y - screenY
                     if i.render == True:
                         pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
                         Window.screen.blit(i.shape, i.rect)
@@ -234,6 +314,35 @@ class GameClass:
 
             pygame.display.update()
     
+    def generate_new_num(self, minN, maxN):
+        self.generation_number = random.randint(minN, maxN)
+        return self.generation_number
+
+    def generate_spawners(self, x, y):
+        global screenX, screenY
+        i = 0
+        n = 0
+        while i < 20:
+            xN = self.generate_new_num(x - self.chunkX, x - 1)
+            yN = self.generate_new_num(y - self.chunkY, y - 1)
+            self.generate_new_num(1, 65536)
+            if self.generation_number <= 10:
+                i += 1
+                airSpawner = LoadResource("spawner.png", (64, 64), xN, yN, "spawner", "Air Spawner")
+                airSpawner.child = LoadResource("air.png", (32, 32), airSpawner.x + random.randint(-100, 100), airSpawner.y + random.randint(-100, 100), "element", "Air", airSpawner.id)
+            elif self.generation_number >= 100 and self.generation_number <= 110:
+                i += 1
+                earthSpawner = LoadResource("spawner.png", (64, 64), xN, yN, "spawner", "Earth Spawner")
+                earthSpawner.child = LoadResource("earth.png", (32, 32), earthSpawner.x + random.randint(-100, 100), earthSpawner.y + random.randint(-100, 100), "element", "Earth", earthSpawner.id)
+            elif self.generation_number >= 1000 and self.generation_number <= 1010:
+                i += 1
+                fireSpawner = LoadResource("spawner.png", (64, 64), xN, yN, "spawner", "Fire Spawner")
+                fireSpawner.child = LoadResource("fire.png", (32, 32), fireSpawner.x + random.randint(-100, 100), fireSpawner.y + random.randint(-100, 100), "element", "Fire", fireSpawner.id)
+            elif self.generation_number >= 10000 and self.generation_number <= 10010:
+                i += 1
+                waterSpawner = LoadResource("spawner.png", (64, 64), xN, yN, "spawner", "Water Spawner")
+                waterSpawner.child = LoadResource("water.png", (32, 32), waterSpawner.x + random.randint(-100, 100), waterSpawner.y + random.randint(-100, 100), "element", "Water", waterSpawner.id)
+
     def player_movement(self):
         global screenX, screenY, keydown
         for event in pygame.event.get():
@@ -257,62 +366,63 @@ class GameClass:
                 keydown = True
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
-                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2048:
                     Main.speed[1] = Main.movement[0]
                     Main.movementFlags[0] = 1
-                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and Main.y < 4096:
                     Main.speed[1] = Main.movement[1]
                     Main.movementFlags[1] = 1
-                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and Main.x > -2048:
                     Main.speed[0] = Main.movement[0]
                     Main.movementFlags[2] = 1
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and Main.x < 4096:
                     Main.speed[0] = Main.movement[1]
                     Main.movementFlags[3] = 1
                 if event.key == pygame.K_e:
-                    textbox.open = not textbox.open
+                    # textbox.open = not textbox.open
+                    print("text")
                 if event.key == pygame.K_q:
                     Main.items = []
                     self.redraw_elements()
 
-        if Main.rect.x < 48 and Main.movementFlags[2]:
+        if Main.rect.x < 48 and Main.movementFlags[2] and Main.x > -2048:
             screenX += 1 * (1 + (1 / Main.rect.x) * 120)
             Main.speed[0] += .3 * (1 + 1 / Main.rect.x)
             if Main.rect.x < 30 and not Main.movementFlags[3]:
                 Main.speed[0] = 0
-        elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2]:
+        elif Main.speed[0] != Main.movement[0] and Main.movementFlags[2] and Main.x > -2048:
             Main.speed[0] = Main.movement[0]
-        elif not Main.movementFlags[2] and not Main.movementFlags[3]:
+        elif not (Main.movementFlags[2] or Main.movementFlags[3]) or Main.x < -2048:
             Main.speed[0] = 0
 
-        if Main.rect.y < 48 and Main.movementFlags[0]:
+        if Main.rect.y < 48 and Main.movementFlags[0] and Main.y > -2048:
             screenY += 1 * (1 + (1 / Main.rect.y) * 120)
             Main.speed[1] += .3 * (1 + 1 / Main.rect.y)
             if Main.rect.y < 30 and not Main.movementFlags[1] and Main.movementFlags[0]:
                 Main.speed[1] = 0
-        elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0]:
+        elif Main.speed[1] != Main.movement[0] and Main.movementFlags[0] and Main.y > -2048:
             Main.speed[1] = Main.movement[0]
-        elif not (Main.movementFlags[0] or Main.movementFlags[1]):
+        elif not (Main.movementFlags[0] or Main.movementFlags[1]) or Main.y < -2048:
             Main.speed[1] = 0
 
-        if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3]:
+        if Main.rect.x > Window.width - 40 - 64 and Main.movementFlags[3] and Main.x < 4096:
             screenX -= 1 * (1 + (Window.width / Main.rect.x) * 3)
             Main.speed[0] -= .3 * (1 + Window.width / Main.rect.x)
             if Main.rect.x > Window.width - 32 - 64 and not Main.movementFlags[2] and Main.movementFlags[3]:
                 Main.speed[0] = 0
-        elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3]:
+        elif Main.speed[0] != Main.movement[1] and Main.movementFlags[3] and Main.x < 4096:
             Main.speed[0] = Main.movement[1]
-        elif not (Main.movementFlags[3] or Main.movementFlags[2]):
+        elif not (Main.movementFlags[3] or Main.movementFlags[2]) or Main.x > 4096:
             Main.speed[0] = 0
 
-        if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1]:
+        if Main.rect.y > Window.height - 48 - 64 - 32 and Main.movementFlags[1] and Main.y < 4096:
             screenY -= 1 * (1 + (Window.height / Main.rect.y) * 3)
             Main.speed[1] -= .3 * (1 + Window.height / Main.rect.y)
             if Main.rect.y > Window.height - 42 - 64 - 32 and not Main.movementFlags[0] and Main.movementFlags[1]:
                 Main.speed[1] = 0
-        elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1]:
+        elif Main.speed[1] != Main.movement[1] and Main.movementFlags[1] and Main.y < 4096:
             Main.speed[1] = Main.movement[1]
-        elif not (Main.movementFlags[1] or Main.movementFlags[0]):
+        elif not (Main.movementFlags[1] or Main.movementFlags[0]) or Main.y > 4096:
             Main.speed[1] = 0
 
     def elem_interact(self, element):
