@@ -14,25 +14,23 @@ A battle / elemental combo
    (These are basic python libraries)
 2. Then navigate to the game (inside the client folder) and run "main.py"
 
-# Recent Update (v0.2.04):
-#### Minor
-- run game through a bat
-- wasd support
+# Recent Update (v0.3.02):
+#### Minor (v2)
+- removed unnecessary code
+- removed debug output
 
-#### Major
-- Inventory GUI implemented
-- Improved GUI / rendering order and implementation
-- `Q`: drop all elements
-- scrolling (infinite area to walk around in)
-- addition of Earth, Fire, and Water
-- new sprite work for elements, spawners, and inventory
-- sound (collecting elements has a pop sound)
+#### Major (v3)
+- New images: background image (Me), spawners (Me), character (friend from school)
+- Loading (terminal / prompt)
+- Randomly generated spawners
+- Background tiling and scrolling
+- reorganization of functions
+- limited area due to no spawners past a certain point
+
+### Release (v0)
+- ...
 
 ### Planned Features
-##### v0.3
-- background image
-- randomly generated spawners
-- music
 ##### v0.4
 - bigger inventory
 - crafting
@@ -40,3 +38,7 @@ A battle / elemental combo
 - server connection
 - basic player interaction
 - card game battle DEMO
+### TBD
+- music
+- animation
+- polish
