@@ -270,8 +270,6 @@ class GameClass:
 
             Main.rect = Main.rect.move(Main.speed)
 
-            Window.screen.fill(self.background)
-
             self.reorder_rendering()
 
             for i in Window.spriteList:
