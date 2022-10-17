@@ -279,7 +279,7 @@ class GameClass:
 
             self.player_movement()
 
-            print(Main.x, Main.y)
+            # print(Main.x, Main.y)
 
             Main.rect = Main.rect.move(Main.speed)
 
