@@ -188,10 +188,16 @@ class LoadBackground:
 
     # tile background
     def tile_background(self):
+        flip = 0
+        prevFlip = 0
         # for every x value a background is able to fill + 2
         for i in range(math.ceil(Window.width / self.width) + 2):
             # for every y value a background is able to fill + 2
             for j in range(math.ceil(Window.height / self.height) + 2):
+                flip = random.randint(0, 1)
+                if flip != prevFlip:
+                    pygame.transform.flip(self.rect, true, false)
+                prevFlip = flip
                 # blit to the screen
                 Window.screen.blit(self.shape, self.rect)
                 # set new center (the middle of the background * x/y value * 2 + screen offset)
