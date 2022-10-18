@@ -429,7 +429,14 @@ class GameClass:
                     Main.movementFlags[3] = 0
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.running = False
+                    if Crafting.render:
+                        Crafting.render = False
+                        Main.allowMovement = True
+                        pygame.mouse.set_visible(True)
+                        self.redraw_elements()
+                        Crafting.Font.render = False
+                    else:
+                        self.running = False
                 if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2148 and Main.allowMovement:
                     Main.movementFlags[0] = 1
                 if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and Main.y < 4196 and Main.allowMovement:
