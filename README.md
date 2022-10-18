@@ -18,7 +18,7 @@ A battle / elemental combo
 - WASD / Arrow keys : Movement
 - Q : Drop an element
 - E : Open Crafting Menu
-- Esc : Close Crafting Menu / Exit Game
+- Esc : Close Crafting Menu / Exit Game  
 Walk around and collect elements from spawners! Draw pictures using the elements in the Crafting menu
 
 # Recent Update (v0.4 Prerelease 17.10:22.31):
