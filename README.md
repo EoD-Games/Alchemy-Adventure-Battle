@@ -19,8 +19,9 @@ A battle / elemental combo
 - Q : Drop elements
 Walk around and collect elements from spawners! Crafting will eventually use E
 
-# Recent Update (v0.3.02):
-#### Minor (v2)
+# Recent Update (v0.3.03):
+#### Minor (v03)
+- movement and generation bugfixes
 - removed unnecessary code
 - removed debug output
 
