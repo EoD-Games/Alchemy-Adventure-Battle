@@ -50,8 +50,8 @@ Walk around and collect elements from spawners! Draw pictures using the elements
 
 ### Planned Features
 ##### v0.4
-- bigger inventory
-- crafting
+- ~~bigger inventory~~
+- crafting (wip)
 ##### v0.5
 - server connection
 - basic player interaction
