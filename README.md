@@ -28,6 +28,7 @@ Walk around and collect elements from spawners! Draw pictures using the elements
 - `Shift+q` removes all elements from inventory
 ---
 - popup menu when 2 or more elements are in crafting menu
+- main character updated to use ElementalPlayer's sprite
 - crafting menu (wip)
 - reorganized functions
 - `esc` closes crafting before exiting game
