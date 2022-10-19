@@ -217,8 +217,8 @@ class LoadBackground:
             Crafting.bottomX = Window.width / 2 + Window.width / 8
             Crafting.bottomY = Window.height / 2 + Window.height / 8
 
-            Crafting.Font.placement = (Window.width / 2 - Window.width / 11, Window.height / 2 - Window.height / 12)
-
+            try: Crafting.Font.placement = (Window.width / 2 - Window.width / 11, Window.height / 2 - Window.height / 12)
+            except: pass
             CraftingCombo.size = (Window.width / 8, Window.width / 8)
             CraftingCombo.shape = pygame.transform.scale(CraftingCombo.image, CraftingCombo.size)
             CraftingCombo.rect = CraftingCombo.shape.get_rect()
