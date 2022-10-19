@@ -25,6 +25,7 @@ Walk around and collect elements from spawners! Draw pictures using the elements
 # Recent Update (v0.4 Prerelease 18.10:23.30):
 #### Minor (v04:P3)
 - Resizable / Fullscreen window!
+- Centered inventory
 - `Shift+q` removes all elements from inventory
 ---
 - popup menu when 2 or more elements are in crafting menu
