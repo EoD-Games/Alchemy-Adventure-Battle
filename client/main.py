@@ -118,7 +118,7 @@ class LoadSprite:
             # e key is pressed flag
             self.eKey = False
             Window.spriteList.append(self)
-        elif type == "topGuiElement":
+        elif type == "topGuiElement" or type == "combo":
             # render flag set to false
             self.render = False
             # id for displaying
@@ -155,7 +155,11 @@ class LoadSprite:
 Main = LoadSprite("Main.png", (64, 64), Window.width/2, Window.height/2, "character", "Player")
 # MAIN GUI MUST BE GUI
 Gui = LoadSprite("hotbar.png", (Window.width - 64, 64), Window.width / 2, Window.height - 32, "topGui", "hotbar")
-Crafting = LoadSprite("inventory.png", (Window.width / 2, Window.height / 2), Window.width / 2, Window.height / 2, "gui", "inventory", render=False)
+Crafting = LoadSprite("inventory.png", (Window.width / 4, Window.height / 4), Window.width / 2, Window.height / 2, "gui", "inventory", render=False)
+Crafting.bottomX = Window.width / 2 + Window.width / 8
+Crafting.bottomY = Window.height / 2 + Window.height / 8
+
+CraftingCombo = LoadSprite("inventory.png", (Window.width / 8, Window.width / 8), Window.width / 5 * 4, Window.height / 2, "gui", "CraftingCombo", render=False)
 # textbox = LoadSprite("Textbox.png", (512, 320), "textbox", "textbox")
 
 resourceId = 0
@@ -188,16 +192,11 @@ class LoadBackground:
 
     # tile background
     def tile_background(self):
-        flip = 0
-        prevFlip = 0
+        index = -1
         # for every x value a background is able to fill + 2
         for i in range(math.ceil(Window.width / self.width) + 2):
             # for every y value a background is able to fill + 2
             for j in range(math.ceil(Window.height / self.height) + 2):
-                flip = random.randint(0, 1)
-                if flip != prevFlip:
-                    pygame.transform.flip(self.rect, true, false)
-                prevFlip = flip
                 # blit to the screen
                 Window.screen.blit(self.shape, self.rect)
                 # set new center (the middle of the background * x/y value * 2 + screen offset)
@@ -268,6 +267,28 @@ class GameClass:
         self.generateNewChunk = False
         self.chunkX, self.chunkY = (2048, 2048)
         self.generated_area = []
+        self.elements = {
+            "Air": {
+                "name": "Air",
+                "recipe": [],
+                "image": "air.png"
+            },
+            "Earth": {
+                "name": "Earth",
+                "recipe": [],
+                "image": "earth.png"
+            },
+            "Fire": {
+                "name": "Fire",
+                "recipe": [],
+                "image": "fire.png"
+            },
+            "Water": {
+                "name": "Water",
+                "recipe": [],
+                "image": "water.png"
+            },
+        }
     
     def run(self):
         global screenX, screenY
@@ -358,15 +379,25 @@ class GameClass:
                 i.tile_background()
 
     def render_gui(self):
+        element_count = {"count": 0, "elements": []}
         for i in Window.guiList:
             self.elem_interact(i)
             pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
             Window.screen.blit(i.shape, i.rect)
             if Crafting.render:
                 i.clickable = True
-                self.check_for_drag(i)
+                self.check_for_drag(i, element_count)
+            if element_count["count"] > 1:
+                CraftingCombo.render = True
+            #    for j in self.elements.values():
+            #        if j["recipe"] == element_count["elements"]:
+            #            CraftedElement = LoadSprite("fire.png", (32, 32), CraftingCombo.rect.x, CraftingCombo.rect.y, "combo", j["name"], 65536)
+            #            break
+            # figure this out. please
+            else:
+                CraftingCombo.render = False
     
-    def check_for_drag(self, element):
+    def check_for_drag(self, element, count):
         global gEvent
         if gEvent.type == MOUSEBUTTONDOWN:
             if gEvent.button == 1 and element.rect.collidepoint(gEvent.pos):
@@ -377,12 +408,14 @@ class GameClass:
         elif gEvent.type == MOUSEBUTTONUP:
             if gEvent.button == 1:
                 element.draging = False
-                # if element.rect.x < Crafting.rect.x or element.rect.x > Crafting.rect.x + Crafting.width
         elif gEvent.type == MOUSEMOTION:
             if element.draging:
                 mx, my = gEvent.pos
                 element.rect.x = mx + element.offsetX
                 element.rect.y = my + element.offsetY
+        if not (element.rect.x < Crafting.rect.x or element.rect.x > Crafting.bottomX or element.rect.y < Crafting.rect.y or element.rect.y > Crafting.bottomY):
+            count["count"] += 1
+            count["elements"].append(element.name.replace(".gui", ""))
 
     def render_text(self):
         for i in Window.fontList:
@@ -441,6 +474,7 @@ class GameClass:
                         pygame.mouse.set_visible(True)
                         self.redraw_elements()
                         Crafting.Font.render = False
+                        CraftingCombo.render = False
                     else:
                         self.running = False
                 if (event.key == pygame.K_UP or event.key == pygame.K_w) and Main.y > -2148 and Main.allowMovement:
@@ -459,13 +493,14 @@ class GameClass:
 
                     if Crafting.render == False:
                         self.redraw_elements()
+                        CraftingCombo.render = False
                     
                     Main.movementFlags = [0, 0, 0, 0]
                     Main.speed = [0, 0]
                     try:
                         Crafting.Font.render = not Crafting.Font.render
                     except:
-                        Crafting.Font = LoadFont("gabs_pixel.ttf", 48, "Crafting", color["black"], (Crafting.rect.x + 140, Crafting.rect.y + 50), False)
+                        Crafting.Font = LoadFont("gabs_pixel.ttf", 48, "Crafting", color["black"], (Window.width / 2 - Window.width / 11, Window.height / 2 - Window.height / 12), False)
                 # drop an item
                 if event.key == pygame.K_q:
                     try:
@@ -548,7 +583,14 @@ class GameClass:
         incX = 0
         incY = 0
         lID = 0
+        x = []
+        for i in Window.guiList:
+            if i.type == "combo":
+                x = LoadSprite(i.image, (20, 20), CraftingCombo.rect.x, CraftingCombo.rect.y, "combo", i.name, 65536)
+            
         Window.guiList = []
+        if x != []:
+            Window.guiList.append(x)
 
         for j in Main.items:
             x = LoadSprite(j.image, (20, 20), Gui.x + incX - (Gui.size[0] / 2 - 50), Gui.y + incY, "topGuiElement", j.name + ".gui", lID)
@@ -562,7 +604,7 @@ class GameClass:
 
     def reorder_rendering(self):
         dummy = []
-        order = ["background", "spawner", "element", "sprite", "character", "textbox", "gui", "topGui"]
+        order = ["background", "spawner", "element", "sprite", "character", "textbox", "gui", "topGui", "combo"]
         for i in range(len(order)):
             for j in Window.spriteList:
                 if j.type == order[i]:
