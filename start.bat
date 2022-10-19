@@ -5,3 +5,4 @@ pip install pygame
 pip install numpy
 cd client
 main.py
+cd..

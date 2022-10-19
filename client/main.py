@@ -29,7 +29,7 @@ color = {"white": (255, 255, 255),
 
 # WINDOW CLASS #
 class WindowClass:
-    def __init__(self, size=(1920, 1080), title="Window", icon=None, color=color["white"]):
+    def __init__(self, size=(1366, 768), title="Window", icon=None, color=color["white"]):
         # size of the window
         self.size = size
         # set title
@@ -40,7 +40,7 @@ class WindowClass:
         # width and height specification
         self.width, self.height = size
         # set the screen size
-        self.screen = pygame.display.set_mode(self.size)
+        self.screen = pygame.display.set_mode(self.size, pygame.RESIZABLE)
         # main window color
         self.color = color
         # center of window
@@ -51,6 +51,8 @@ class WindowClass:
         self.fontList = []
         # list of all inventory items on screen
         self.guiList = []
+        # fullscreen flag
+        self.fullscreen = False
 
 # Must be called "Window"
 Window = WindowClass((1920 / 2, 1080 / 2), "Alchemy: to the Death!", "elements.png")
@@ -159,7 +161,7 @@ Crafting = LoadSprite("inventory.png", (Window.width / 4, Window.height / 4), Wi
 Crafting.bottomX = Window.width / 2 + Window.width / 8
 Crafting.bottomY = Window.height / 2 + Window.height / 8
 
-CraftingCombo = LoadSprite("inventory.png", (Window.width / 8, Window.width / 8), Window.width / 5 * 4, Window.height / 2, "gui", "CraftingCombo", render=False)
+CraftingCombo = LoadSprite("combo.png", (Window.width / 8, Window.width / 8), Window.width / 5 * 4, Window.height / 2, "gui", "CraftingCombo", render=False)
 # textbox = LoadSprite("Textbox.png", (512, 320), "textbox", "textbox")
 
 resourceId = 0
@@ -193,6 +195,34 @@ class LoadBackground:
     # tile background
     def tile_background(self):
         index = -1
+        nextwidth, nextheight = Window.screen.get_size()
+        if nextwidth != Window.width or nextheight != Window.height:
+            Window.width = nextwidth
+            Window.height = nextheight
+
+            Gui.size = (Window.width - 64, 64)
+            Gui.shape = pygame.transform.scale(Gui.image, Gui.size)
+            Gui.rect = Gui.shape.get_rect()
+            Gui.rect.center = (Window.width / 2, Window.height - 32)
+
+            Main.rect.center = (Window.width / 2, Window.height / 2)
+            Main.x, Main.y = Main.rect.center
+
+            Game.redraw_elements()
+
+            Crafting.size = (Window.width / 4, Window.height / 4)
+            Crafting.shape = pygame.transform.scale(Crafting.image, Crafting.size)
+            Crafting.rect = Crafting.shape.get_rect()
+            Crafting.rect.center = (Window.width / 2, Window.height / 2)
+            Crafting.bottomX = Window.width / 2 + Window.width / 8
+            Crafting.bottomY = Window.height / 2 + Window.height / 8
+
+            Crafting.Font.placement = (Window.width / 2 - Window.width / 11, Window.height / 2 - Window.height / 12)
+
+            CraftingCombo.size = (Window.width / 8, Window.width / 8)
+            CraftingCombo.shape = pygame.transform.scale(CraftingCombo.image, CraftingCombo.size)
+            CraftingCombo.rect = CraftingCombo.shape.get_rect()
+            CraftingCombo.rect.center = (Window.width / 5 * 4, Window.height / 2)
         # for every x value a background is able to fill + 2
         for i in range(math.ceil(Window.width / self.width) + 2):
             # for every y value a background is able to fill + 2
@@ -292,7 +322,6 @@ class GameClass:
     
     def run(self):
         global screenX, screenY
-        pygame.mouse.set_visible(False)
 
         random.seed(random.randint(0, 65535))
         # TODO: get seed from server
@@ -327,9 +356,6 @@ class GameClass:
         print("Loading: 100%")
 
         while self.running:
-
-            if not pygame.mouse.get_visible():
-                pygame.mouse.set_pos([Window.width / 2, Window.height / 2])
             self.prevFps = self.fps
             self.fps = pygame.time.Clock().tick(60)
 
@@ -471,7 +497,6 @@ class GameClass:
                     if Crafting.render:
                         Crafting.render = False
                         Main.allowMovement = True
-                        pygame.mouse.set_visible(True)
                         self.redraw_elements()
                         Crafting.Font.render = False
                         CraftingCombo.render = False
@@ -489,7 +514,6 @@ class GameClass:
                 if event.key == pygame.K_e:
                     Crafting.render = not Crafting.render
                     Main.allowMovement = not Main.allowMovement
-                    pygame.mouse.set_visible(Crafting.render)
 
                     if Crafting.render == False:
                         self.redraw_elements()
@@ -506,6 +530,9 @@ class GameClass:
                     try:
                         Main.items.pop()
                     except: pass
+                    self.redraw_elements()
+                if event.key == pygame.K_q and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                    Main.items = []
                     self.redraw_elements()
         if Main.allowMovement:
             if Main.rect.x < Window.width / 2 - 50 and Main.movementFlags[2] and Main.x > -2148:
@@ -593,7 +620,9 @@ class GameClass:
             Window.guiList.append(x)
 
         for j in Main.items:
-            x = LoadSprite(j.image, (20, 20), Gui.x + incX - (Gui.size[0] / 2 - 50), Gui.y + incY, "topGuiElement", j.name + ".gui", lID)
+            offset = len(Main.items) * 7.5
+            if offset > 50 * 7.5: offset = 50 * 7.5
+            x = LoadSprite(j.image, (20, 20), Window.width / 2 + incX - offset, Window.height - 40 + incY, "topGuiElement", j.name + ".gui", lID)
 
             incX += 16
             if incX >= 50 * 16:
