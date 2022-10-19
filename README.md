@@ -21,8 +21,10 @@ A battle / elemental combo
 - Esc : Close Crafting Menu / Exit Game  
 Walk around and collect elements from spawners! Draw pictures using the elements in the Crafting menu
 
-# Recent Update (v0.4 Prerelease 17.10:22.31):
-#### Minor (v04:P1)
+# Recent Update (v0.4 Prerelease 18.10:23.30):
+#### Minor (v04:P2)
+- crafting menu now has a popup that shows up when there are multiple elements on the screen
+---
 - crafting menu (wip)
 - reorganized functions
 - `esc` closes crafting before exiting game
