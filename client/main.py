@@ -219,6 +219,7 @@ class LoadBackground:
 
             try: Crafting.Font.placement = (Window.width / 2 - Window.width / 11, Window.height / 2 - Window.height / 12)
             except: pass
+
             CraftingCombo.size = (Window.width / 8, Window.width / 8)
             CraftingCombo.shape = pygame.transform.scale(CraftingCombo.image, CraftingCombo.size)
             CraftingCombo.rect = CraftingCombo.shape.get_rect()
@@ -237,16 +238,27 @@ Background = LoadBackground("background.png", (128, 128), "mainBg")
 
 class LoadFont:
     def __init__(self, location, size, text, color, placement, aaFlag=True, boldFlag=False, italicFlag=False):
+        # file location
         self.location = location
+        # font size
         self.size = size
+        # placement on the screen
         self.placement = placement
+        # font text
         self.text = text
+        # font color
         self.color = color
+        # font display
         self.font = pygame.font.Font(self.location, self.size)
+        # render
         self.render = True
+        # font image
         self.image = self.font.render(self.text, aaFlag, self.color)
+        # font rect
         self.rect = pygame.draw.rect(self.image, self.color, self.image.get_rect(), -1)
+        # bold flag
         self.font.bold = boldFlag
+        # italic flag
         self.font.italic = italicFlag
         Window.fontList.append(self)
 
@@ -288,15 +300,17 @@ class LoadResource:
 
 class GameClass:
     def __init__(self):
+        # run while
         self.running = True
-        self.background = color["white"]
+        # check fps
         self.prevFps = 0
+        # fps
         self.fps = 0
-        self.resources = {}
+        # random number for seed
         self.generation_number = 0
-        self.generateNewChunk = False
+        # chunks
         self.chunkX, self.chunkY = (2048, 2048)
-        self.generated_area = []
+        # stored elements
         self.elements = {
             "Air": {
                 "name": "Air",
@@ -328,41 +342,34 @@ class GameClass:
 
         print("Loading: 0%")
         self.generate_spawners(0, 0)
-        self.generated_area.append([-1, -1])
         print("Loading: 11%")
         self.generate_spawners(0, self.chunkY)
-        self.generated_area.append([-1, 0])
         print("Loading: 22%")
         self.generate_spawners(-self.chunkX, self.chunkY * 2)
-        self.generated_area.append([-1, 1])
         print("Loading: 33%")
         self.generate_spawners(self.chunkX, 0)
-        self.generated_area.append([0, -1])
         print("Loading: 44%")
         self.generate_spawners(self.chunkX, self.chunkY)
-        self.generated_area.append([0, 0])
         print("Loading: 55%")
         self.generate_spawners(self.chunkX, self.chunkY * 2)
-        self.generated_area.append([0, 1])
         print("Loading: 66%")
         self.generate_spawners(self.chunkX * 2, -self.chunkY)
-        self.generated_area.append([1, -1])
         print("Loading: 77%")
         self.generate_spawners(self.chunkX * 2, self.chunkY)
-        self.generated_area.append([1, 0])
         print("Loading: 88%")
         self.generate_spawners(self.chunkX * 2, self.chunkY * 2)
-        self.generated_area.append([1, 1])
         print("Loading: 100%")
 
         while self.running:
             self.prevFps = self.fps
             self.fps = pygame.time.Clock().tick(60)
 
+            # check for player movemet before rendering
             self.player_movement()
 
             # print(Main.x, Main.y)
 
+            # set movement
             Main.rect = Main.rect.move(Main.speed)
 
             self.reorder_rendering()
@@ -371,82 +378,6 @@ class GameClass:
             self.render_text()
 
             pygame.display.update()
-    
-    def render_sprite(self):
-        for i in Window.spriteList:
-            if i.type != "textbox" and i.type != "background":
-                if i.type == "spawner":
-                    if self.prevFps != self.fps:
-                        i.timer += 1
-                    if (i.timer == 30 + random.randint(-6, 6) or i.timer == 40) and i.resProd < 10:
-                        copyElem = LoadResource(i.child.image, i.child.size, i.child.x, i.child.y, "element", i.child.name, i.id, 1)
-                        i.children.append(copyElem)
-                        Window.spriteList.append(i.children[len(i.children) - 1])
-                        i.child = LoadResource(i.child.image, i.child.size, i.x + random.randint(-100, 100), i.y + random.randint(-100, 100), "element", i.child.name, i.id, 1)
-                        i.timer = 0
-                        i.resProd += 1
-                    elif i.resProd >= 10:
-                        i.timer = 0
-                    # print(i.resProd)
-                elif i.type == "element":
-                    self.elem_interact(i)
-                if i.type != "character" and i.type != "topGui" and i.type != "gui" and i.type != "topGuiElement":
-                    i.rect.center = (i.x + screenX, i.y + screenY)
-                elif i.type == "character":
-                    i.x = i.rect.x - screenX
-                    i.y = i.rect.y - screenY
-                if i.render == True:
-                    pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
-                    Window.screen.blit(i.shape, i.rect)
-                else:
-                    if i.type != "gui":
-                        i.render = True
-            elif i.type == "background":
-                i.tile_background()
-
-    def render_gui(self):
-        element_count = {"count": 0, "elements": []}
-        for i in Window.guiList:
-            self.elem_interact(i)
-            pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
-            Window.screen.blit(i.shape, i.rect)
-            if Crafting.render:
-                i.clickable = True
-                self.check_for_drag(i, element_count)
-            if element_count["count"] > 1:
-                CraftingCombo.render = True
-            #    for j in self.elements.values():
-            #        if j["recipe"] == element_count["elements"]:
-            #            CraftedElement = LoadSprite("fire.png", (32, 32), CraftingCombo.rect.x, CraftingCombo.rect.y, "combo", j["name"], 65536)
-            #            break
-            # figure this out. please
-            else:
-                CraftingCombo.render = False
-    
-    def check_for_drag(self, element, count):
-        global gEvent
-        if gEvent.type == MOUSEBUTTONDOWN:
-            if gEvent.button == 1 and element.rect.collidepoint(gEvent.pos):
-                element.draging = True
-                mx, my = gEvent.pos
-                element.offsetX = element.rect.x - mx
-                element.offsetY = element.rect.y - my
-        elif gEvent.type == MOUSEBUTTONUP:
-            if gEvent.button == 1:
-                element.draging = False
-        elif gEvent.type == MOUSEMOTION:
-            if element.draging:
-                mx, my = gEvent.pos
-                element.rect.x = mx + element.offsetX
-                element.rect.y = my + element.offsetY
-        if not (element.rect.x < Crafting.rect.x or element.rect.x > Crafting.bottomX or element.rect.y < Crafting.rect.y or element.rect.y > Crafting.bottomY):
-            count["count"] += 1
-            count["elements"].append(element.name.replace(".gui", ""))
-
-    def render_text(self):
-        for i in Window.fontList:
-            if i.render:
-                Window.screen.blit(i.image, i.placement)
 
     def generate_new_num(self, minN, maxN):
         self.generation_number = random.randint(minN, maxN)
@@ -576,6 +507,87 @@ class GameClass:
             elif (not Main.movementFlags[0] and not Main.movementFlags[1]):
                 Main.speed[1] = 0
 
+    def reorder_rendering(self):
+        dummy = []
+        order = ["background", "spawner", "element", "sprite", "character", "textbox", "gui", "topGui", "combo"]
+        for i in range(len(order)):
+            for j in Window.spriteList:
+                if j.type == order[i]:
+                    dummy.append(j)
+        # print([i.type for i in dummy])
+        Window.spriteList = dummy
+
+    def render_sprite(self):
+        for i in Window.spriteList:
+            if i.type != "textbox" and i.type != "background":
+                if i.type == "spawner":
+                    if self.prevFps != self.fps:
+                        i.timer += 1
+                    if (i.timer == 30 + random.randint(-6, 6) or i.timer == 40) and i.resProd < 10:
+                        copyElem = LoadResource(i.child.image, i.child.size, i.child.x, i.child.y, "element", i.child.name, i.id, 1)
+                        i.children.append(copyElem)
+                        Window.spriteList.append(i.children[len(i.children) - 1])
+                        i.child = LoadResource(i.child.image, i.child.size, i.x + random.randint(-100, 100), i.y + random.randint(-100, 100), "element", i.child.name, i.id, 1)
+                        i.timer = 0
+                        i.resProd += 1
+                    elif i.resProd >= 10:
+                        i.timer = 0
+                    # print(i.resProd)
+                elif i.type == "element":
+                    self.elem_interact(i)
+                if i.type != "character" and i.type != "topGui" and i.type != "gui" and i.type != "topGuiElement":
+                    i.rect.center = (i.x + screenX, i.y + screenY)
+                elif i.type == "character":
+                    i.x = i.rect.x - screenX
+                    i.y = i.rect.y - screenY
+                if i.render == True:
+                    pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
+                    Window.screen.blit(i.shape, i.rect)
+                else:
+                    if i.type != "gui":
+                        i.render = True
+            elif i.type == "background":
+                i.tile_background()
+
+    def render_gui(self):
+        element_count = {"count": 0, "elements": []}
+        for i in Window.guiList:
+            self.elem_interact(i)
+            pygame.draw.rect(Window.screen, color["black"], i.rect, -1)
+            Window.screen.blit(i.shape, i.rect)
+            if Crafting.render:
+                i.clickable = True
+                self.check_for_drag(i, element_count)
+            if element_count["count"] > 1:
+                CraftingCombo.render = True
+            #    for j in self.elements.values():
+            #        if j["recipe"] == element_count["elements"]:
+            #            CraftedElement = LoadSprite("fire.png", (32, 32), CraftingCombo.rect.x, CraftingCombo.rect.y, "combo", j["name"], 65536)
+            #            break
+            # figure this out. please
+            else:
+                CraftingCombo.render = False
+    
+    def check_for_drag(self, element, count):
+        global gEvent
+        if gEvent.type == MOUSEBUTTONDOWN:
+            if gEvent.button == 1 and element.rect.collidepoint(gEvent.pos):
+                element.draging = True
+                mx, my = gEvent.pos
+                element.offsetX = element.rect.x - mx
+                element.offsetY = element.rect.y - my
+        elif gEvent.type == MOUSEBUTTONUP:
+            if gEvent.button == 1:
+                element.draging = False
+        elif gEvent.type == MOUSEMOTION:
+            if element.draging:
+                mx, my = gEvent.pos
+                element.rect.x = mx + element.offsetX
+                element.rect.y = my + element.offsetY
+        if not (element.rect.x < Crafting.rect.x or element.rect.x > Crafting.bottomX or element.rect.y < Crafting.rect.y or element.rect.y > Crafting.bottomY):
+            count["count"] += 1
+            count["elements"].append(element.name.replace(".gui", ""))
+
     def elem_interact(self, element):
         global Gui
         px, py = Main.rect.center
@@ -631,15 +643,11 @@ class GameClass:
         
         # print([i.name for i in Window.guiList], [i.name for i in Main.items])
 
-    def reorder_rendering(self):
-        dummy = []
-        order = ["background", "spawner", "element", "sprite", "character", "textbox", "gui", "topGui", "combo"]
-        for i in range(len(order)):
-            for j in Window.spriteList:
-                if j.type == order[i]:
-                    dummy.append(j)
-        # print([i.type for i in dummy])
-        Window.spriteList = dummy
+
+    def render_text(self):
+        for i in Window.fontList:
+            if i.render:
+                Window.screen.blit(i.image, i.placement)
 
 Game = GameClass()
 Game.run()
